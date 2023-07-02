@@ -15,7 +15,8 @@ namespace Big_Bang_Assessment.Repo
         Task<Doctor> PutDoctor(int Doctor_id, Doctor doctor, IFormFile imageFile);
         public Doctor DeleteDoctor(int Doctor_Id);
 
-        public Task<UpdateStatus> UpdateStatus(UpdateStatus status);
+        public Task<UpdateStatus> UpdateStatus(UpdateStatus status); 
+        public Task<UpdateStatus> DeclineDoctorStatus(UpdateStatus status);
 
         public Task<ICollection<Doctor>> RequestedDoctor();
         public Task<ICollection<Doctor>> AcceptedDoctor();

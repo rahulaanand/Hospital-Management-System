@@ -102,6 +102,17 @@ namespace Big_Bang_Assessment.Controllers
             return Ok(result);
         }
 
+        [HttpPut("Decline Doctor")]
+        public async Task<ActionResult<UpdateStatus>> UpdateDeclineStatus(UpdateStatus status)
+        {
+            var result = await _doctorRepo.DeclineDoctorStatus(status);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
         [HttpGet("Requested status")]
         public async Task<ActionResult<UpdateStatus>> GetRequestedDoctors()
         {

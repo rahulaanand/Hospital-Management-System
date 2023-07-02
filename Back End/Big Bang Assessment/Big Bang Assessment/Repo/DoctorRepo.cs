@@ -131,6 +131,23 @@ namespace Big_Bang_Assessment.Repo
             return null;
         }
 
+        public async Task<UpdateStatus> DeclineDoctorStatus(UpdateStatus status)
+        {
+            var doc = await _context.Doctors.FirstOrDefaultAsync(s => s.DoctorId == status.id);
+            if (doc != null)
+            {
+                if (doc.Status == "Requested")
+                {
+                    doc.Status = "Declined";
+                    await _context.SaveChangesAsync();
+                    return status;
+                }
+                return status;
+
+            }
+            return null;
+        }
+
         public async Task<ICollection<Doctor>> RequestedDoctor()
         {
             var doc = await _context.Doctors.Where(s=>s.Status=="Requested").ToListAsync();
