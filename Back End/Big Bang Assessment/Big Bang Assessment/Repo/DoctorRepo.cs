@@ -2,10 +2,13 @@
 using Big_Bang_Assessment.Models;
 using Big_Bang_Assessment.Models.DTOs;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Big_Bang_Assessment.Repo
 {
@@ -13,23 +16,24 @@ namespace Big_Bang_Assessment.Repo
     {
         private readonly HospitalContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
+
         public DoctorRepo(HospitalContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public IEnumerable<Doctor> GetAllDoctors()
+        public IEnumerable<Doctor> GetDoctor()
         {
             return _context.Doctors.Include(x => x.Patients).ToList();
         }
 
-        public Doctor GetDoctorById(int doctorId)
+        public Doctor DoctorbyId(int Doctor_Id)
         {
-            return _context.Doctors.FirstOrDefault(d => d.DoctorId == doctorId);
+            return _context.Doctors.FirstOrDefault(d => d.DoctorId == Doctor_Id);
         }
 
-        public async Task<DoctorDTO> AddDoctor([FromForm] Doctor doctor, IFormFile imageFile)
+        public async Task<Doctor> CreateDoctor(Doctor doctor, IFormFile imageFile)
         {
             if (imageFile == null || imageFile.Length == 0)
             {
@@ -51,28 +55,12 @@ namespace Big_Bang_Assessment.Repo
             _context.Doctors.Add(doctor);
             await _context.SaveChangesAsync();
 
-            // Create a DoctorDTO object with the desired properties
-            var doctorDto = new DoctorDTO
-            {
-                DoctorName = doctor.DoctorName,
-                DoctorSpeciality = doctor.DoctorSpeciality,
-                DoctorAge = doctor.DoctorAge,
-                DoctorGender = doctor.DoctorGender,
-                DoctorEmail = doctor.DoctorEmail,
-                DoctorPwd = doctor.DoctorPwd,
-                DoctorExperience = doctor.DoctorExperience,
-                Description = doctor.Description,
-                PhoneNumber = doctor.PhoneNumber,
-                DoctorImage = doctor.DoctorImage
-            };
-
-            return doctorDto;
+            return doctor;
         }
 
-
-        public async Task<Doctor> UpdateDoctor(int doctorId, Doctor doctor, IFormFile imageFile)
+        public async Task<Doctor> PutDoctor(int Doctor_id, Doctor doctor, IFormFile imageFile)
         {
-            var existingDoctor = await _context.Doctors.FindAsync(doctorId);
+            var existingDoctor = await _context.Doctors.FindAsync(Doctor_id);
             if (existingDoctor == null)
             {
                 return null;
@@ -114,15 +102,53 @@ namespace Big_Bang_Assessment.Repo
             return existingDoctor;
         }
 
-
-        public void DeleteDoctor(int doctorId)
+        public Doctor DeleteDoctor(int Doctor_Id)
         {
-            var doctor = _context.Doctors.FirstOrDefault(d => d.DoctorId == doctorId);
+            var doctor = _context.Doctors.FirstOrDefault(d => d.DoctorId == Doctor_Id);
             if (doctor != null)
             {
                 _context.Doctors.Remove(doctor);
                 _context.SaveChanges();
+                return doctor;
             }
+            return null;
+        }
+
+        public async Task<UpdateStatus> UpdateStatus(UpdateStatus status)
+        {
+            var doc =await _context.Doctors.FirstOrDefaultAsync(s => s.DoctorId == status.id);
+            if (doc != null)
+            {
+                if (doc.Status == "Requested")
+                {
+                    doc.Status= "Accepted";
+                    await _context.SaveChangesAsync();
+                    return status;
+                }
+                return status;
+                
+            }
+            return null;
+        }
+
+        public async Task<ICollection<Doctor>> RequestedDoctor()
+        {
+            var doc = await _context.Doctors.Where(s=>s.Status=="Requested").ToListAsync();
+            if (doc != null)
+            {
+                return doc;
+            }
+            return null;
+        }
+
+        public async Task<ICollection<Doctor>> AcceptedDoctor()
+        {
+            var doc = await _context.Doctors.Where(s => s.Status == "Accepted").ToListAsync();
+            if (doc != null)
+            {
+                return doc;
+            }
+            return null;
         }
     }
 }

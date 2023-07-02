@@ -7,9 +7,6 @@ namespace Big_Bang_Assessment.Models
     {
         [Key]
         public int PatientId { get; set; }
-        public int Doctor_id { get; set; }
-        [ForeignKey("Doctor_id")]
-        public Doctor? Doctors { get; set; }
         public string? PatientName { get; set; }
         public int Age { get; set; }
         public string? Gender { get; set; }

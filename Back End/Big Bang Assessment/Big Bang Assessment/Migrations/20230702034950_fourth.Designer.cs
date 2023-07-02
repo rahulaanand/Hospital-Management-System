@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Big_Bang_Assessment.Migrations
 {
     [DbContext(typeof(HospitalContext))]
-    [Migration("20230630140950_first")]
-    partial class first
+    [Migration("20230702034950_fourth")]
+    partial class fourth
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,18 +33,50 @@ namespace Big_Bang_Assessment.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AdminId"));
 
+                    b.Property<string>("AdPassword")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("AdminEmail")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AdminName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("AdminId");
 
                     b.ToTable("Admins");
+                });
+
+            modelBuilder.Entity("Big_Bang_Assessment.Models.Appointment", b =>
+                {
+                    b.Property<int>("AppointmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AppointmentId"));
+
+                    b.Property<string>("AppointmentDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Doctor_id")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AppointmentId");
+
+                    b.HasIndex("Doctor_id");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("Appointments");
                 });
 
             modelBuilder.Entity("Big_Bang_Assessment.Models.Doctor", b =>
@@ -107,7 +139,7 @@ namespace Big_Bang_Assessment.Migrations
                     b.Property<int>("Contact")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DoctorsDoctorId")
+                    b.Property<int?>("DoctorId")
                         .HasColumnType("int");
 
                     b.Property<string>("EmailId")
@@ -124,18 +156,33 @@ namespace Big_Bang_Assessment.Migrations
 
                     b.HasKey("PatientId");
 
-                    b.HasIndex("DoctorsDoctorId");
+                    b.HasIndex("DoctorId");
 
                     b.ToTable("Patients");
                 });
 
-            modelBuilder.Entity("Big_Bang_Assessment.Models.Patient", b =>
+            modelBuilder.Entity("Big_Bang_Assessment.Models.Appointment", b =>
                 {
                     b.HasOne("Big_Bang_Assessment.Models.Doctor", "Doctors")
-                        .WithMany("Patients")
-                        .HasForeignKey("DoctorsDoctorId");
+                        .WithMany()
+                        .HasForeignKey("Doctor_id");
+
+                    b.HasOne("Big_Bang_Assessment.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Doctors");
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("Big_Bang_Assessment.Models.Patient", b =>
+                {
+                    b.HasOne("Big_Bang_Assessment.Models.Doctor", null)
+                        .WithMany("Patients")
+                        .HasForeignKey("DoctorId");
                 });
 
             modelBuilder.Entity("Big_Bang_Assessment.Models.Doctor", b =>

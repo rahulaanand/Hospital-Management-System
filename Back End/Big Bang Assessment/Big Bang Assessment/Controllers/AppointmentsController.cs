@@ -7,62 +7,60 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Big_Bang_Assessment.Context;
 using Big_Bang_Assessment.Models;
-using Microsoft.AspNetCore.Cors;
 
 namespace Big_Bang_Assessment.Controllers
 {
-    [EnableCors("MyCorsPolicy")]
     [Route("api/[controller]")]
     [ApiController]
-    public class PatientsController : ControllerBase
+    public class AppointmentsController : ControllerBase
     {
         private readonly HospitalContext _context;
 
-        public PatientsController(HospitalContext context)
+        public AppointmentsController(HospitalContext context)
         {
             _context = context;
         }
 
-        // GET: api/Patients
+        // GET: api/Appointments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Patient>>> GetPatients()
+        public async Task<ActionResult<IEnumerable<Appointment>>> GetAppointments()
         {
-          if (_context.Patients == null)
+          if (_context.Appointments == null)
           {
               return NotFound();
           }
-            return await _context.Patients.ToListAsync();
+            return await _context.Appointments.ToListAsync();
         }
 
-        // GET: api/Patients/5
+        // GET: api/Appointments/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Patient>> GetPatient(int id)
+        public async Task<ActionResult<Appointment>> GetAppointment(int id)
         {
-          if (_context.Patients == null)
+          if (_context.Appointments == null)
           {
               return NotFound();
           }
-            var patient = await _context.Patients.FindAsync(id);
+            var appointment = await _context.Appointments.FindAsync(id);
 
-            if (patient == null)
+            if (appointment == null)
             {
                 return NotFound();
             }
 
-            return patient;
+            return appointment;
         }
 
-        // PUT: api/Patients/5
+        // PUT: api/Appointments/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPatient(int id, Patient patient)
+        public async Task<IActionResult> PutAppointment(int id, Appointment appointment)
         {
-            if (id != patient.PatientId)
+            if (id != appointment.AppointmentId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(patient).State = EntityState.Modified;
+            _context.Entry(appointment).State = EntityState.Modified;
 
             try
             {
@@ -70,7 +68,7 @@ namespace Big_Bang_Assessment.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PatientExists(id))
+                if (!AppointmentExists(id))
                 {
                     return NotFound();
                 }
@@ -83,44 +81,44 @@ namespace Big_Bang_Assessment.Controllers
             return NoContent();
         }
 
-        // POST: api/Patients
+        // POST: api/Appointments
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Patient>> PostPatient(Patient patient)
+        public async Task<ActionResult<Appointment>> PostAppointment(Appointment appointment)
         {
-          if (_context.Patients == null)
+          if (_context.Appointments == null)
           {
-              return Problem("Entity set 'HospitalContext.Patients'  is null.");
+              return Problem("Entity set 'HospitalContext.Appointments'  is null.");
           }
-            _context.Patients.Add(patient);
+            _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPatient", new { id = patient.PatientId }, patient);
+            return CreatedAtAction("GetAppointment", new { id = appointment.AppointmentId }, appointment);
         }
 
-        // DELETE: api/Patients/5
+        // DELETE: api/Appointments/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePatient(int id)
+        public async Task<IActionResult> DeleteAppointment(int id)
         {
-            if (_context.Patients == null)
+            if (_context.Appointments == null)
             {
                 return NotFound();
             }
-            var patient = await _context.Patients.FindAsync(id);
-            if (patient == null)
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment == null)
             {
                 return NotFound();
             }
 
-            _context.Patients.Remove(patient);
+            _context.Appointments.Remove(appointment);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool PatientExists(int id)
+        private bool AppointmentExists(int id)
         {
-            return (_context.Patients?.Any(e => e.PatientId == id)).GetValueOrDefault();
+            return (_context.Appointments?.Any(e => e.AppointmentId == id)).GetValueOrDefault();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Big_Bang_Assessment.Context;
 using Big_Bang_Assessment.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Big_Bang_Assessment.Controllers
 {
+    [EnableCors("MyCorsPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class TokenController : ControllerBase
