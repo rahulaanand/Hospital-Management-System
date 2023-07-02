@@ -12,6 +12,6 @@ namespace Big_Bang_Assessment.Models
         public string? Gender { get; set; }
         public string? EmailId { get; set; }
         public string? Password { get; set; }
-        public int Contact { get; set; }
+        public string? Contact { get; set; }
     }
 }

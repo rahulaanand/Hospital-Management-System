@@ -24,7 +24,7 @@ namespace Big_Bang_Assessment.Models
 
         public string? Description { get; set; }
 
-        public int PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         public string? Status { get; set; }
 

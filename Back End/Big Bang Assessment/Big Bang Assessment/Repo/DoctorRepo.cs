@@ -30,7 +30,10 @@ namespace Big_Bang_Assessment.Repo
 
         public Doctor DoctorbyId(int Doctor_Id)
         {
-            return _context.Doctors.FirstOrDefault(d => d.DoctorId == Doctor_Id);
+            return _context.Doctors
+    .Include(x => x.Patients)
+    .FirstOrDefault(d => d.DoctorId == Doctor_Id);
+
         }
 
         public async Task<Doctor> CreateDoctor(Doctor doctor, IFormFile imageFile)
@@ -160,12 +163,18 @@ namespace Big_Bang_Assessment.Repo
 
         public async Task<ICollection<Doctor>> AcceptedDoctor()
         {
-            var doc = await _context.Doctors.Where(s => s.Status == "Accepted").ToListAsync();
+            var doc = await _context.Doctors
+                .Where(s => s.Status == "Accepted")
+                .Include(x => x.Patients)
+                .ToListAsync();
+
             if (doc != null)
             {
                 return doc;
             }
+
             return null;
         }
+
     }
 }

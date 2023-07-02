@@ -120,9 +120,9 @@ namespace Big_Bang_Assessment.Controllers
         [HttpPost("Admin")]
         public async Task<IActionResult> PostAdmin(Admin staffData)
         {
-            if (staffData != null && !string.IsNullOrEmpty(staffData.AdminName) && !string.IsNullOrEmpty(staffData.AdPassword))
+            if (staffData != null && !string.IsNullOrEmpty(staffData.AdminEmail) && !string.IsNullOrEmpty(staffData.AdPassword))
             {
-                if (staffData.AdminName == "Rahul" && staffData.AdPassword == "Rahul@123")
+                if (staffData.AdminEmail == "rahulsk@gmail.com" && staffData.AdPassword == "Rahulsk@10")
                 {
                     var claims = new[]
                     {
@@ -130,7 +130,7 @@ namespace Big_Bang_Assessment.Controllers
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                         new Claim("AdminId", "1"), // Set the admin ID accordingly
-                        new Claim("AdminName", staffData.AdminName),
+                        new Claim("AdminEmail", staffData.AdminEmail),
                         new Claim("AdPassword", staffData.AdPassword),
                         new Claim(ClaimTypes.Role, AdminRole)
                     };
