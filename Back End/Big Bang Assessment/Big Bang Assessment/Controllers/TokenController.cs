@@ -39,7 +39,7 @@ namespace Big_Bang_Assessment.Controllers
                 var user = await _context.Doctors.FirstOrDefaultAsync(x =>
                     x.DoctorName == _userData.DoctorName && x.DoctorPwd == _userData.DoctorPwd);
 
-                if (user != null)
+                if (user != null && user.DoctorName !=null && user.DoctorPwd !=null)
                 {
                     var claims = new[]
                     {
@@ -77,12 +77,12 @@ namespace Big_Bang_Assessment.Controllers
         [HttpPost("Patients")]
         public async Task<IActionResult> PostPatient(Patient _userData)
         {
-            if (_userData != null && !string.IsNullOrEmpty(_userData.PatientName) && !string.IsNullOrEmpty(_userData.Password))
+            if (_userData != null && _context.Patients!=null && !string.IsNullOrEmpty(_userData.PatientName) && !string.IsNullOrEmpty(_userData.Password))
             {
                 var user = await _context.Patients.FirstOrDefaultAsync(x =>
                     x.PatientName == _userData.PatientName && x.Password == _userData.Password);
 
-                if (user != null)
+                if (user != null && user.PatientName != null && user.Password != null)
                 {
                     var claims = new[]
                     {
@@ -118,11 +118,11 @@ namespace Big_Bang_Assessment.Controllers
         }
 
         [HttpPost("Admin")]
-        public async Task<IActionResult> PostAdmin(Admin staffData)
+        public async Task<IActionResult>? PostAdmin(Admin staffData)
         {
             if (staffData != null && !string.IsNullOrEmpty(staffData.AdminEmail) && !string.IsNullOrEmpty(staffData.AdPassword))
             {
-                if (staffData.AdminEmail == "rahulsk@gmail.com" && staffData.AdPassword == "Rahulsk@10")
+                if (staffData.AdminEmail == "admin@gmail.com" && staffData.AdPassword == "Admin@123")
                 {
                     var claims = new[]
                     {

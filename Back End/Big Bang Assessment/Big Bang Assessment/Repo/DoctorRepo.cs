@@ -25,15 +25,18 @@ namespace Big_Bang_Assessment.Repo
 
         public IEnumerable<Doctor> GetDoctor()
         {
-            return _context.Doctors.Include(x => x.Patients).ToList();
+            if(_context.Doctors!=null)
+                return _context.Doctors.Include(x => x.Patients).ToList();
+            throw new Exception();
         }
 
-        public Doctor DoctorbyId(int Doctor_Id)
+        public Doctor DoctorbyId(string name )
         {
-            return _context.Doctors
-    .Include(x => x.Patients)
-    .FirstOrDefault(d => d.DoctorId == Doctor_Id);
-
+            if(_context != null && _context.Doctors != null && _context.Patients != null)
+            {
+                return _context.Doctors.Include(x => x.Patients).FirstOrDefault(d => d.DoctorName == name);
+            }
+            throw new Exception();
         }
 
         public async Task<Doctor> CreateDoctor(Doctor doctor, IFormFile imageFile)
@@ -55,125 +58,153 @@ namespace Big_Bang_Assessment.Repo
             doctor.DoctorImage = fileName;
             doctor.Status = "Requested";
 
-            _context.Doctors.Add(doctor);
-            await _context.SaveChangesAsync();
+            if(_context.Doctors != null)
+            {
+                _context.Doctors.Add(doctor);
+                await _context.SaveChangesAsync();
+            }
 
             return doctor;
         }
 
         public async Task<Doctor> PutDoctor(int Doctor_id, Doctor doctor, IFormFile imageFile)
         {
-            var existingDoctor = await _context.Doctors.FindAsync(Doctor_id);
-            if (existingDoctor == null)
+            if(_context.Doctors != null)
             {
-                return null;
-            }
-
-            if (imageFile != null && imageFile.Length > 0)
-            {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                var existingDoctor = await _context.Doctors.FindAsync(Doctor_id);
+                if (existingDoctor == null)
                 {
-                    await imageFile.CopyToAsync(stream);
+                    throw new Exception();
                 }
 
-                // Delete the old image file
-                var oldFilePath = Path.Combine(uploadsFolder, existingDoctor.DoctorImage);
-                if (File.Exists(oldFilePath))
+                if (imageFile != null && imageFile.Length > 0)
                 {
-                    File.Delete(oldFilePath);
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+
+                    if(existingDoctor.DoctorImage != null)
+                    {
+                        var oldFilePath = Path.Combine(uploadsFolder, existingDoctor.DoctorImage);
+                        if (File.Exists(oldFilePath))
+                        {
+                            File.Delete(oldFilePath);
+                        }
+
+                        existingDoctor.DoctorImage = fileName;
+                    }
+                   
+                   
                 }
 
-                existingDoctor.DoctorImage = fileName;
+                existingDoctor.DoctorName = doctor.DoctorName;
+                existingDoctor.DoctorSpeciality = doctor.DoctorSpeciality;
+                existingDoctor.DoctorAge = doctor.DoctorAge;
+                existingDoctor.DoctorGender = doctor.DoctorGender;
+                existingDoctor.DoctorEmail = doctor.DoctorEmail;
+                existingDoctor.DoctorPwd = doctor.DoctorPwd;
+                existingDoctor.DoctorExperience = doctor.DoctorExperience;
+                existingDoctor.Description = doctor.Description;
+                existingDoctor.PhoneNumber = doctor.PhoneNumber;
+
+                await _context.SaveChangesAsync();
+
+                return existingDoctor;
             }
-
-            existingDoctor.DoctorName = doctor.DoctorName;
-            existingDoctor.DoctorSpeciality = doctor.DoctorSpeciality;
-            existingDoctor.DoctorAge = doctor.DoctorAge;
-            existingDoctor.DoctorGender = doctor.DoctorGender;
-            existingDoctor.DoctorEmail = doctor.DoctorEmail;
-            existingDoctor.DoctorPwd = doctor.DoctorPwd;
-            existingDoctor.DoctorExperience = doctor.DoctorExperience;
-            existingDoctor.Description = doctor.Description;
-            existingDoctor.PhoneNumber = doctor.PhoneNumber;
-
-            await _context.SaveChangesAsync();
-
-            return existingDoctor;
+            throw new Exception();
+           
         }
 
         public Doctor DeleteDoctor(int Doctor_Id)
         {
-            var doctor = _context.Doctors.FirstOrDefault(d => d.DoctorId == Doctor_Id);
-            if (doctor != null)
+            if (_context.Doctors != null)
             {
-                _context.Doctors.Remove(doctor);
-                _context.SaveChanges();
-                return doctor;
+                var doctor = _context.Doctors.FirstOrDefault(d => d.DoctorId == Doctor_Id);
+                if (doctor != null)
+                {
+                    _context.Doctors.Remove(doctor);
+                    _context.SaveChanges();
+                    return doctor;
+                }
             }
-            return null;
+            throw new Exception();
         }
 
         public async Task<UpdateStatus> UpdateStatus(UpdateStatus status)
         {
-            var doc =await _context.Doctors.FirstOrDefaultAsync(s => s.DoctorId == status.id);
-            if (doc != null)
+            if (_context.Doctors != null)
             {
-                if (doc.Status == "Requested")
+                var doc = await _context.Doctors.FirstOrDefaultAsync(s => s.DoctorId == status.id);
+                if (doc != null)
                 {
-                    doc.Status= "Accepted";
-                    await _context.SaveChangesAsync();
+                    if (doc.Status == "Requested")
+                    {
+                        doc.Status = "Accepted";
+                        await _context.SaveChangesAsync();
+                        return status;
+                    }
                     return status;
+
                 }
-                return status;
-                
             }
-            return null;
+            throw new Exception();
         }
 
         public async Task<UpdateStatus> DeclineDoctorStatus(UpdateStatus status)
         {
-            var doc = await _context.Doctors.FirstOrDefaultAsync(s => s.DoctorId == status.id);
-            if (doc != null)
+            if (_context.Doctors != null)
             {
-                if (doc.Status == "Requested")
+                var doc = await _context.Doctors.FirstOrDefaultAsync(s => s.DoctorId == status.id);
+                if (doc != null)
                 {
-                    doc.Status = "Declined";
-                    await _context.SaveChangesAsync();
+                    if (doc.Status == "Requested")
+                    {
+                        doc.Status = "Declined";
+                        await _context.SaveChangesAsync();
+                        return status;
+                    }
                     return status;
-                }
-                return status;
 
+                }
             }
-            return null;
+            throw new Exception();
         }
 
         public async Task<ICollection<Doctor>> RequestedDoctor()
         {
-            var doc = await _context.Doctors.Where(s=>s.Status=="Requested").ToListAsync();
-            if (doc != null)
+            if (_context.Doctors != null)
             {
-                return doc;
+                var doc = await _context.Doctors.Where(s => s.Status == "Requested").ToListAsync();
+                if (doc != null)
+                {
+                    return doc;
+                }
             }
-            return null;
+            
+            throw new Exception();
         }
 
         public async Task<ICollection<Doctor>> AcceptedDoctor()
         {
-            var doc = await _context.Doctors
-                .Where(s => s.Status == "Accepted")
-                .Include(x => x.Patients)
-                .ToListAsync();
-
-            if (doc != null)
+            if (_context.Doctors != null )
             {
-                return doc;
+                var doc = await _context.Doctors.Where(s => s.Status == "Accepted")
+               .Include(x => x.Patients)
+               .ToListAsync();
+
+                if (doc != null)
+                {
+                    return doc;
+                }
+
             }
 
-            return null;
+            throw new Exception();
         }
 
     }

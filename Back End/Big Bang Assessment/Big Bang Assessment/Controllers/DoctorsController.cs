@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
 using Big_Bang_Assessment.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Big_Bang_Assessment.Controllers
 {
@@ -21,6 +22,7 @@ namespace Big_Bang_Assessment.Controllers
             _doctorRepo = doctorRepo;
         }
 
+        [Authorize(Roles ="Doctor,Admin,Patient")]
         // GET api/doctors
         [HttpGet]
         public ActionResult<IEnumerable<Doctor>> GetAllDoctors()
@@ -30,16 +32,17 @@ namespace Big_Bang_Assessment.Controllers
         }
 
         // GET api/doctors/{id}
-        [HttpGet("{id}")]
-        public ActionResult<Doctor> GetDoctorById(int id)
+        [HttpGet("get bt name")]
+        public ActionResult<Doctor> GetDoctorById(string name)
         {
-            var doctor = _doctorRepo.DoctorbyId(id);
+            var doctor = _doctorRepo.DoctorbyId(name);
             if (doctor == null)
             {
                 return NotFound();
             }
             return Ok(doctor);
         }
+
 
         // POST api/doctors
         [HttpPost]
@@ -56,6 +59,8 @@ namespace Big_Bang_Assessment.Controllers
                 return BadRequest(ModelState);
             }
         }
+
+        [Authorize(Roles = "Doctor,Admin")]
 
         // PUT api/doctors/{id}
         [HttpPut("{id}")]
@@ -78,6 +83,7 @@ namespace Big_Bang_Assessment.Controllers
             }
         }
 
+        [Authorize(Roles = "Doctor,Admin")]
         // DELETE api/doctors/{id}
         [HttpDelete("{id}")]
         public IActionResult DeleteDoctor(int id)
@@ -90,7 +96,8 @@ namespace Big_Bang_Assessment.Controllers
 
             return NoContent();
         }
-
+        
+        [Authorize(Roles = "Admin")]
         [HttpPut("Update status")]
         public async Task<ActionResult<UpdateStatus>> UpdateStatus(UpdateStatus status)
         {
@@ -102,6 +109,7 @@ namespace Big_Bang_Assessment.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("Decline Doctor")]
         public async Task<ActionResult<UpdateStatus>> UpdateDeclineStatus(UpdateStatus status)
         {
@@ -113,6 +121,7 @@ namespace Big_Bang_Assessment.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("Requested status")]
         public async Task<ActionResult<UpdateStatus>> GetRequestedDoctors()
         {

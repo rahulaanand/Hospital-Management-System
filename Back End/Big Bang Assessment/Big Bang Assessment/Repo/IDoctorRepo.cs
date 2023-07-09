@@ -10,7 +10,7 @@ namespace Big_Bang_Assessment.Repo
     public interface IDoctorRepo
     {
         public IEnumerable<Doctor> GetDoctor();
-        public Doctor DoctorbyId(int Doctor_Id);
+        public Doctor DoctorbyId(string name );
         Task<Doctor> CreateDoctor([FromForm] Doctor doctor, IFormFile imageFile);
         Task<Doctor> PutDoctor(int Doctor_id, Doctor doctor, IFormFile imageFile);
         public Doctor DeleteDoctor(int Doctor_Id);
